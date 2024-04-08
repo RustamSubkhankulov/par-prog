@@ -19,10 +19,10 @@ int main(int argc, char **argv)
   
   int n = (MAX - 1) / (size + 1);
   
-  int ibeg = rank * n + 1;
-  int iend = (rank + 1) * n;
+  unsigned ibeg = rank * n + 1;
+  unsigned iend = (rank + 1) * n;
   
-  for(int i = ibeg; i <= ((iend > MAX)? MAX : iend); i++) {
+  for(unsigned i = ibeg; i <= ((iend > MAX)? MAX : iend); i++) {
     std::cout << "Process " << rank << ", " << i << "^2 = " << i*i << "\n";
   }
     

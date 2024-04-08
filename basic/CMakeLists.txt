@@ -28,6 +28,3 @@ file(GLOB EXEC_SOURCES CONFIGURE_DEPENDS ${EXEC_SRC_DIR}/*.cpp)
 
 add_executable(${PROJECT_NAME} ${EXEC_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${EXEC_INC_DIR})
-
-message(STATUS "Running: mpirun -n 2 $<TARGET_FILE_DIR:${PROJECT_NAME}>")
-add_custom_target(run COMMAND mpirun -n 2 $<TARGET_FILE_DIR:${PROJECT_NAME}>)
