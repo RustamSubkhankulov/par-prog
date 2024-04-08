@@ -1,0 +1,4 @@
+/Users/rustamsubkhankulov/Desktop/workspace/parprog/basic/build/CMakeFiles/basic.dir
+/Users/rustamsubkhankulov/Desktop/workspace/parprog/basic/build/CMakeFiles/run.dir
+/Users/rustamsubkhankulov/Desktop/workspace/parprog/basic/build/CMakeFiles/edit_cache.dir
+/Users/rustamsubkhankulov/Desktop/workspace/parprog/basic/build/CMakeFiles/rebuild_cache.dir
