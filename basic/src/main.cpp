@@ -1,22 +1,29 @@
+#include <cstdlib>
 #include <iostream>
 
 #include "mpi.h"
+#include "mpi_support.hpp"
 
 static const unsigned MAX = 100U;
 
 int main(int argc, char **argv)
 {
-  int rank, size;
+  int res, rank, size;
 
   /* Инициализация среды MPI */
-  MPI_Init(&argc, &argv);
-  
+  res = MPI_Init(&argc, &argv);
+  EXIT_ON_MPI_FAILURE(res);
+
   /* Общее число процессов в коммуникаторе */
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  res = MPI_Comm_size(MPI_COMM_WORLD, &size);
+  EXIT_ON_MPI_FAILURE(res);
   
   /* Ранг процесса */
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  res = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  EXIT_ON_MPI_FAILURE(res);
   
+  std::cout << "Process " << rank << " Comm size " << size << std::endl;
+
   int n = (MAX - 1) / (size + 1);
   
   unsigned ibeg = rank * n + 1;
@@ -26,6 +33,11 @@ int main(int argc, char **argv)
     std::cout << "Process " << rank << ", " << i << "^2 = " << i*i << "\n";
   }
     
+  std::cout << "Process " << rank << " finished.\n";
+
   /* Остановка среды MPI */
-  MPI_Finalize();
+  res = MPI_Finalize();
+  EXIT_ON_MPI_FAILURE(res);
+
+  return 0;
 }

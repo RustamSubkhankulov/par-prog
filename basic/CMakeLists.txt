@@ -21,10 +21,10 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-set(EXEC_SRC_DIR src)
-set(EXEC_INC_DIR inc)
+set(SRC_DIR src)
+set(INC_DIR inc)
 
-file(GLOB EXEC_SOURCES CONFIGURE_DEPENDS ${EXEC_SRC_DIR}/*.cpp)
+file(GLOB SOURCES CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
 
-add_executable(${PROJECT_NAME} ${EXEC_SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${EXEC_INC_DIR})
+add_executable(${PROJECT_NAME} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
