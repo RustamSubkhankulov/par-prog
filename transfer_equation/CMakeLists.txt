@@ -24,21 +24,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(SRC_DIR src)
 set(INC_DIR inc)
 
-set(MPI_SUPPORT_SOURCES ${SRC_DIR}/mpi_support.cpp)
-set(COMP_MATH_SOURCES ${SRC_DIR}/comp_math.cpp)
+file(GLOB SOURCES CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
 
-add_executable(
-  sequential 
-  ${SRC_DIR}/sequential.cpp 
-  ${COMP_MATH_SOURCES}
-)
-
-add_executable(
-  parallel 
-  ${SRC_DIR}/parallel.cpp 
-  ${MPI_SUPPORT_SOURCES}
-  ${COMP_MATH_SOURCES}
-)
-
-target_include_directories(sequential PRIVATE ${INC_DIR})
-target_include_directories(parallel PRIVATE ${INC_DIR})
+add_executable(${PROJECT_NAME} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
