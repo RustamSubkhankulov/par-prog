@@ -24,7 +24,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(SRC_DIR src)
 set(INC_DIR inc)
 
-file(GLOB SOURCES CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
+set(SEQ_SRC ${SRC_DIR}/sequential.cpp)
+set(PAR_SRC ${SRC_DIR}/parallel.cpp ${SRC_DIR}/mpi_support.cpp)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
+add_executable(sequential ${SEQ_SRC})
+target_include_directories(sequential PRIVATE ${INC_DIR})
+
+add_executable(parallel ${PAR_SRC})
+target_include_directories(parallel PRIVATE ${INC_DIR})

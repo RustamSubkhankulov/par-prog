@@ -6,7 +6,7 @@
 #include "mpi.h"
 #include "mpi_support.hpp"
 
-#include "comp_math.cpp"
+#include "comp_math.hpp"
 
 static const unsigned Msg_tag = 5U;
 
@@ -30,11 +30,11 @@ int main(int argc, char **argv)
   EXIT_ON_MPI_FAILURE(res);
   
   Comp_scheme comp_scheme{
-    1e-3,   /* h        */
-    5e-6,   /* tau      */
-    100000, /* x_points */
-    20000,  /* t_points */
-    1e-2    /* a        */
+    1e-3,     /* h        */
+    5e-6,     /* tau      */
+    10000000, /* x_points */
+    2000,     /* t_points */
+    1e-2      /* a        */
   };
 
   try {
@@ -59,10 +59,12 @@ int main(int argc, char **argv)
   uint64_t compute_end = (x_idx_end == x_points)? 
                           x_idx_end - 1 : x_idx_end;
 
+#ifdef DEBUG
   std::cout << "[" << rank << "]" << " x_idx_begin: "   << x_idx_begin
                                   << " x_idx_end: "     << x_idx_end
                                   << " compute_begin: " << compute_begin
                                   << " compute_end: "   << compute_end << "\n";
+#endif
 
   /* u(0,x) = fi(x) */
   Comp_scheme::bound_func_type fi  = (double(*)(double))&std::sin;
@@ -82,7 +84,6 @@ int main(int argc, char **argv)
       [tau](uint64_t t_idx) { return t_idx * tau; };
 
     for (uint64_t t_idx = 0; t_idx < t_points; ++t_idx) {
-
       comp_scheme.set(0, t_idx, psi(t_idx));
     }
   }
@@ -90,11 +91,17 @@ int main(int argc, char **argv)
   int lft_neigh = (rank == max_rank)? MPI_PROC_NULL : rank + 1;
   int rgt_neigh = (rank == min_rank)? MPI_PROC_NULL : rank - 1;
 
+#ifdef DEBUG
   std::cout << "[" << rank << "]:" << " lft_neigh: " << ((lft_neigh == MPI_PROC_NULL)? 
                                       "MPI_PROC_NULL" : std::to_string(lft_neigh))
 
                                    << " rgt_neigh: " << ((rgt_neigh == MPI_PROC_NULL)? 
                                       "MPI_PROC_NULL" : std::to_string(rgt_neigh)) << "\n";
+#endif
+
+  if (rank == 0) {
+    mpi_start_timer();
+  }
 
   for (uint64_t t_idx = 1; t_idx < t_points; ++t_idx) {
 
@@ -136,6 +143,10 @@ int main(int argc, char **argv)
 
   /* Wait for all of the chunks to be calculated */
   MPI_Barrier(MPI_COMM_WORLD);
+
+  if (rank == 0) {
+    std::cout << "Elapsed: " << mpi_stop_timer() << " sec \n";
+  }
 
   /* Free allocated arrays */
   comp_scheme.free();

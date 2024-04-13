@@ -112,19 +112,7 @@ public:
   }
 
   double get(uint64_t m, uint64_t k) const noexcept { return u[m][k]; }
-
   void set(uint64_t m, uint64_t k, double val) noexcept { u[m][k] = val; }
-
-  // void set_boundaries(bound_func_type fi, bound_func_type psi) {
-
-  //   for (uint64_t x_idx = 0; x_idx < x_points_m; ++x_idx) {
-  //     u[x_idx][0] = fi(x_idx);
-  //   }
-
-  //   for (uint64_t t_idx = 0; t_idx < t_points_m; ++t_idx) {
-  //     u[0][t_idx] = psi(t_idx);
-  //   }
-  // }
 
   void swap(Comp_scheme& that) {
 

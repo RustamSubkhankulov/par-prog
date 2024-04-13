@@ -3,6 +3,22 @@
 #include "mpi.h"
 #include "mpi_support.hpp"
 
+static double timer_start;
+
+void mpi_start_timer() {
+
+  timer_start = MPI_Wtime();
+  std::clog << "MPI timer started at " << timer_start << std::endl;
+}
+
+double mpi_stop_timer() {
+
+  double timer_end = MPI_Wtime();
+  std::clog  << "MPI timer stopped at " << timer_end << std::endl;
+
+  return timer_end - timer_start;
+}
+
 void exit_on_mpi_failure(const int res, const char* file, const char* func, const int line) {
 
   if (res != MPI_SUCCESS) {
