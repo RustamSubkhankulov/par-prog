@@ -23,5 +23,5 @@ cmake -b build && cmake --build build --target transfer_eq
 #### Запуск
 Запуск программы:
 ```
-mpirun -n <ЖЕЛАЕМОЕ КОЛИЧЕСТВО УЗЛОВ> build/parallel
+mpirun -n <ЖЕЛАЕМОЕ КОЛИЧЕСТВО УЗЛОВ> build/transfer_eq
 ```
