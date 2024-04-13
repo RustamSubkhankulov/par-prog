@@ -22,20 +22,19 @@ int main()
   uint64_t t_points = comp_scheme.t_points();  
 
   /* u(0,x) = fi(x) */
+  double h = comp_scheme.h();
   Comp_scheme::bound_func_type fi  = (double(*)(double))&std::sin;
 
   for (uint64_t x_idx = 0; x_idx < x_points; ++x_idx) {
-    comp_scheme.set(x_idx, 0, fi(x_idx));
+    comp_scheme.set(x_idx, 0, fi(x_idx * h));
   }
 
   /* u(t,0) = psi(t) */
   double tau = comp_scheme.tau();
-
-  Comp_scheme::bound_func_type psi = 
-    [tau](uint64_t t_idx) { return t_idx * tau; };
+  Comp_scheme::bound_func_type psi = [](uint64_t t_idx) { return t_idx; };
 
   for (uint64_t t_idx = 0; t_idx < t_points; ++t_idx) {
-    comp_scheme.set(0, t_idx, psi(t_idx));
+    comp_scheme.set(0, t_idx, psi(t_idx * tau));
   }
 
   auto start_time = std::chrono::steady_clock::now();
