@@ -32,8 +32,8 @@ int main(int argc, char **argv)
   Comp_scheme comp_scheme{
     1e-3,     /* h        */
     5e-6,     /* tau      */
-    10000000, /* x_points */
-    2000,     /* t_points */
+    10000008, /* x_points */
+    100,      /* t_points */
     1e-2      /* a        */
   };
 

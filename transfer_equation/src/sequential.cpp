@@ -11,8 +11,8 @@ int main()
   Comp_scheme comp_scheme{
     1e-3,     /* h        */
     5e-6,     /* tau      */
-    2000000,  /* x_points */
-    2000,     /* t_points */
+    10000008, /* x_points */
+    100,      /* t_points */
     1e-2      /* a        */
   };
 
@@ -47,8 +47,8 @@ int main()
   }
 
   auto stop_time = std::chrono::steady_clock::now();
-  auto elapsed = std::chrono::duration_cast<std::chrono::seconds> (stop_time - start_time).count();
-  std::cout << "Elapsed: " << elapsed << " sec \n";
+  auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds> (stop_time - start_time).count();
+  std::cout << "Elapsed: " << elapsed / 1000. << " sec \n";
 
   /* Free allocated arrays */
   comp_scheme.free();

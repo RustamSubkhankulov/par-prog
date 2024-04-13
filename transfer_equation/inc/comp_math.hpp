@@ -22,9 +22,6 @@ private:
   double a_m;
   rside_func_type f_m;
 
-  double X_m;
-  double T_m;
-
   double** u = nullptr;
   double* data = nullptr;
 
@@ -38,9 +35,7 @@ public:
     x_points_m(x_points), 
     t_points_m(t_points), 
     a_m(a), 
-    f_m(f),
-    X_m(h_m * x_points_m), 
-    T_m(tau_m * t_points_m) 
+    f_m(f)
     {}
 
   Comp_scheme(const Comp_scheme& that) = delete;
@@ -53,8 +48,6 @@ public:
     t_points_m(that.t_points_m), 
     a_m(that.a_m), 
     f_m(that.f_m),
-    X_m(that.X_m), 
-    T_m(that.T_m),
     u(std::exchange(that.u, nullptr)),
     data(std::exchange(that.data, nullptr))
     {}
@@ -76,9 +69,6 @@ public:
   noexcept(std::is_nothrow_copy_constructible<rside_func_type>::value) { 
     return f_m; 
   }
-
-  double X() const noexcept { return X_m; }
-  double T() const noexcept { return T_m; }
 
   void allocate() {
 
@@ -122,8 +112,6 @@ public:
     std::swap(t_points_m, that.t_points_m); 
     std::swap(a_m, that.a_m); 
     std::swap(f_m, that.f_m);
-    std::swap(X_m, that.X_m); 
-    std::swap(T_m, that.T_m); 
 
     std::swap(u, that.u);
     std::swap(data, that.data);
