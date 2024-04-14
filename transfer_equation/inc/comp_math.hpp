@@ -9,7 +9,7 @@ class Comp_scheme {
 public:
 
   using rside_func_type = std::function<double(uint64_t, uint64_t)>;
-  using bound_func_type = std::function<double(uint64_t)>;
+  using bound_func_type = std::function<double(double)>;
 
 private:
 
@@ -86,6 +86,20 @@ public:
     delete[] u;
   }
 
+  void set_boundary_time(uint64_t m, bound_func_type psi) {
+
+    for (uint64_t t_idx = 0; t_idx < t_points_m; ++t_idx) {
+      set(m, t_idx, psi(t_idx * tau_m));
+    }
+  }
+
+  void set_boundary_coord(uint64_t m_begin, uint64_t m_end, bound_func_type fi) {
+
+    for (uint64_t x_idx = m_begin; x_idx < m_end; ++x_idx) {
+      set(x_idx, 0, fi(x_idx * h_m));
+    }
+  }
+
   void compute(uint64_t m, uint64_t k) {
     
     auto diff = u[m+1][k] - u[m-1][k];
@@ -96,13 +110,31 @@ public:
 
     for (uint64_t m = m_begin; m < m_end; ++m) {
 
+    #ifdef DEBUG
+      std::cout << "computing u[" << m << "][" << k+1 << "]\n";
+      std::cout << "u[" << m+1 << "][" << k << "]=" << u[m+1][k] << " ";
+      std::cout << "u[" << m-1 << "][" << k << "]=" << u[m-1][k] << " ";
+    #endif
+
       auto diff = u[m+1][k] - u[m-1][k];
       u[m][k+1] = tau_m * (f_m(m, k) - a_m * diff / (2 * h_m)) + diff / 2;
+
+    #ifdef DEBUG
+      std::cout << "u[" << m << "][" << k+1 << "]=" << u[m][k+1] << "\n";
+    #endif
     }
   }
 
   double get(uint64_t m, uint64_t k) const noexcept { return u[m][k]; }
-  void set(uint64_t m, uint64_t k, double val) noexcept { u[m][k] = val; }
+  
+  void set(uint64_t m, uint64_t k, double val) noexcept { 
+
+  #ifdef DEBUG
+    std::cout << "u[" << m << "][" << k << "]=" << val << "\n";
+  #endif
+
+    u[m][k] = val; 
+  }
 
   void swap(Comp_scheme& that) {
 

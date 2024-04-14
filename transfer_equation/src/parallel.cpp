@@ -48,6 +48,8 @@ int main(int argc, char **argv)
   }
 
   uint64_t x_points = comp_scheme.x_points();
+  uint64_t t_points = comp_scheme.t_points();
+  
   uint64_t x_points_per_proc = x_points / size;
 
   uint64_t x_idx_begin = x_points_per_proc * rank;
@@ -67,24 +69,20 @@ int main(int argc, char **argv)
 #endif
 
   /* u(0,x) = fi(x) */
-  double h = comp_scheme.h();
-  Comp_scheme::bound_func_type fi  = (double(*)(double))&std::sin;
+  Comp_scheme::bound_func_type fi  = [](double arg) -> double { return 1000. * std::sin(arg); };
+  comp_scheme.set_boundary_coord(x_idx_begin, x_idx_end, fi);
 
-  for (uint64_t x_idx = x_idx_begin; x_idx < x_idx_end; ++x_idx) {
-    comp_scheme.set(x_idx, 0, fi(x_idx * h));
+  /* u(t,0) = psi(t) */
+  Comp_scheme::bound_func_type psi = [](double arg) { return 100. * arg; };
+
+  if (rank == min_rank) {
+    /* u(t,0) = u(t,x_points-1) = psi(t) */
+    comp_scheme.set_boundary_time(0, psi);
   }
 
-  uint64_t t_points = comp_scheme.t_points();  
-
-  if (rank == 0) {
-
-    /* u(t,0) = psi(t) */
-    double tau = comp_scheme.tau();
-    Comp_scheme::bound_func_type psi = [](uint64_t t_idx) { return t_idx; };
-
-    for (uint64_t t_idx = 0; t_idx < t_points; ++t_idx) {
-      comp_scheme.set(0, t_idx, psi(t_idx * tau));
-    }
+  if (rank == max_rank) {
+    /* u(t,x_points-1) = psi(t) */
+    comp_scheme.set_boundary_time(x_points-1, psi);
   }
 
   int lft_neigh = (rank == max_rank)? MPI_PROC_NULL : rank + 1;
@@ -102,7 +100,7 @@ int main(int argc, char **argv)
     mpi_start_timer();
   }
 
-  for (uint64_t t_idx = 1; t_idx < t_points; ++t_idx) {
+  for (uint64_t t_idx = 0; t_idx < t_points-1; ++t_idx) {
 
     /* Send points from previous iteration to neighbours */
 
@@ -146,6 +144,46 @@ int main(int argc, char **argv)
   if (rank == 0) {
     std::cout << "Elapsed: " << mpi_stop_timer() << " sec \n";
   }
+
+  if (rank == 0) {
+
+    /* Receive calculated values from all other nodes */
+    for (int node = 1; node < size; ++node) {
+
+      uint64_t begin = x_points_per_proc * node;
+      uint64_t end   = x_points_per_proc * (node + 1);
+
+      for (uint64_t x_idx = begin; x_idx < end; ++x_idx) {
+
+        double value_recv;
+        res = MPI_Recv(&value_recv, 1, MPI_DOUBLE, node, Msg_tag, 
+                                       MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        EXIT_ON_MPI_FAILURE(res);
+
+        comp_scheme.set(x_idx, t_points-1, value_recv);
+      }      
+    }
+
+  } else {
+
+    /* Send calculated values to node №0 */
+    for (uint64_t x_idx = x_idx_begin; x_idx < x_idx_end; ++x_idx) {
+
+      double value_send = comp_scheme.get(x_idx, t_points-1);
+      res = MPI_Send(&value_send, 1, MPI_DOUBLE, 0, Msg_tag, MPI_COMM_WORLD);
+      EXIT_ON_MPI_FAILURE(res);
+    }
+  }
+
+#ifdef PRINT
+  if (rank == 0) {
+    /* Print values */
+    for (uint64_t x_idx = 0; x_idx < x_points; ++x_idx) {
+      std::cout << "u[" << x_idx << "][" << comp_scheme.t_points()-1 << "]=" 
+                  << comp_scheme.get(x_idx, comp_scheme.t_points()-1) << "\n";
+    }
+  }
+#endif
 
   /* Free allocated arrays */
   comp_scheme.free();
