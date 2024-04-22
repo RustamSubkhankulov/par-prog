@@ -11,6 +11,7 @@ int main() {
   std::pair<double, double> bound = std::make_pair(1E-5, 1.);
 
   Gstack_integrator integrator{func, bound};
+  
   integrator.integrate();
   std::cout << "Integrator result: " << integrator.res() << std::endl;
 

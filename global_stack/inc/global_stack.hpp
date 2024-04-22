@@ -23,7 +23,7 @@ private:
   static constexpr double Precision = 1E-9;
 
   /* Precision for break condition of integration */
-  static constexpr double Eps = 1E-6;
+  static constexpr double Eps = 1E-7;
 
   /* 
    * Maximum local stack size 
@@ -31,7 +31,7 @@ private:
    * and theres is space available in global stack,
    * entries are moved from local stack to global
    */
-  static constexpr unsigned int Max_local_sp = 5;
+  static constexpr unsigned int Max_local_sp = 4;
 
   struct Entry {
 
@@ -70,7 +70,7 @@ private:
    * State semaphore indicating non-zero 
    * amount of entries in global stack 
    */
-  std::binary_semaphore sem_task_present{1};
+  std::binary_semaphore sem_task_present{0};
 
   /* Access to global stack */
   std::mutex mtx_gstack;

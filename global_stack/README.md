@@ -13,7 +13,7 @@ $$A<=x<=B, A,B>0, A<B$$
 
 #### Метод глобального стека
 
-За основу возьмем **метод локального стека**,
+За основу возьмем **метод локального стека** (ниже приведен псевдокод без использования примитивов синхронизации),
 
 ```
 IntegrateLocalStack(A,B)
@@ -47,7 +47,7 @@ IntegrateLocalStack(A,B)
   if(|sAB-sACB|≥ε|sACB|)
   {
     PUT_INTO_STACK( A, C, fA, fC, sAC)
-    
+
     A=C
     fA=fC
     sAB=sCB
@@ -74,10 +74,116 @@ IntegrateLocalStack(A,B)
   - взять один **отрезок** из **глобального стека**
   - выполнить алгоритм локального стека (см. ниже), но если в момент обращения к **локальному стеку** в нем уже есть несколько **отрезков**, а в **глобальном стеке** отрезки отсутствуют, то переместить часть **отрезков** из **локального стека** в **глобальный стек**
 
+#### Реализация
+Класс интегратора принимает в качетве аргументов конструктора функцию и границы интегрирования. В дальнейшем эти значения можно изменить с помощью соотвествующих методов класса.
+```
+Gstack_integrator::function func = [](double x) -> double { return std::sin(1./x); };
+std::pair<double, double> bound = std::make_pair(1E-5, 1.);
+
+Gstack_integrator integrator{func, bound};
+```
+
+Запуск интегрирования:
+```
+integrator.integrate();
+std::cout << "Integrator result: " << integrator.res() << std::endl;
+```
+
+Для синхронизации потоков использованы мьютексы и бинарные семафоры:
+```
+class Gstack_integrator {
+
+  /* ... */
+
+private:
+
+  /* 
+   * State semaphore indicating non-zero 
+   * amount of entries in global stack 
+   */
+  std::binary_semaphore sem_task_present{0};
+
+  /* Access to global stack */
+  std::mutex mtx_gstack;
+  
+  /* Access to result value of the integral */
+  std::mutex mtx_int_val;
+
+  /* ... */
+
+};
+```
+
+Главная функция интегрирования запускает **Application** потоки и ждёт завершения их работы.
+```
+void Gstack_integrator::integrate() {
+
+  /* ... */
+
+  /* Startup application threads */
+  for (unsigned int thread_idx = 0; 
+                    thread_idx < Appl_threads_num;
+                    thread_idx++) {
+
+    tvec.push_back(std::thread(appl_thread_func));
+  }
+
+  /* Wait for all of the application threads to end */
+  for (auto thread = tvec.begin(); thread != tvec.end(); ++thread) {
+    thread->join();
+  }
+
+  /* ... */
+}
+```
+
+Каждый поток в свою очередь выполняет следующий код:
+- Получается запись о периоде из глобального стека
+- Завершает выполнение, если это терминальная запись
+- Исполняет алгоритм локального стека
+- Если глобальный стек пуст и нет больше периодов для интегрирования, заполняет глобальный стек терминальными записями в количестве **Application** потоков
+```
+void Gstack_integrator::appl_thread_function() {
+
+  /* ... */ 
+
+  /* While there are entries in global stack */
+  while (true) {
+
+    /* Obtain entry from the global stack */
+    Entry entry = get_entry_from_gstack();
+
+    /* Stop main loop if period is terminal */
+    if (entry.A > entry.B) {
+      break;
+    }
+
+    /* ... */
+
+    /* Integrate another period locally */
+    integrate_local(entry);
+
+    /* Try-populate gstack with terminal periods */
+    populate_gstack_terminal();
+  }
+
+  /* ... */
+}
+```
+
 #### Сборка
 Для того, чтобы собрать проект, воспользуйтесь следующей коммандой:
 ```
 cmake -b build && cmake --build build --target integrate
+```
+Доступные опции сборки: 
+1. **VERBOSE** - включает дополнительный вывод информации об исполнении потоками алгоритма глобального стека 
+2. **TIME** - включает измерение времени исполнения каждого потока в отдельности и процесса интегрирования в целом и вывод измеренных значений
+3. **NTHREADS** - количество потоков, использовуемых при интегрировании. Если данное значение не указано, будет использовано значение **std::thread::hardware_concurrency()**
+
+Пример сборки с указанием параметров:
+```
+cmake -B build -DVERBOSE=ON -DTIME=ON -DNTHREADS=8 && cmake --build build --target integrate
 ```
 
 #### Запуск
@@ -85,5 +191,21 @@ cmake -b build && cmake --build build --target integrate
 ```
 ./build/integrate
 ```
-#### Результаты измерений
+При указании **-DTIME=ON** при сборке, вывод программы будет содержать измеренные значения времени исполнения каждого потока:
 
+```
+T #<Идентификатор потока 1>
+Elapsed: <Время исполнения потока 1 в секундах> sec
+-----
+
+...
+
+T #<Идентификатор потока N>
+Elapsed: <Время исполнения потока N в секундах> sec
+-----
+Total elapsed: <Полное время процесса интегрирования в секундах> sec
+Integrator result: <Значения интеграла>
+```
+
+#### Результаты измерений
+Ниже приведены результаты измерения времени интегрирования на разном количестве потоков:

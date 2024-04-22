@@ -1,5 +1,6 @@
 #include <cmath>
 #include <thread>
+#include <cstdint>
 #include <iostream>
 #include <algorithm>
 #include <type_traits>
@@ -33,8 +34,6 @@ void Gstack_integrator::integrate() {
   auto start_time = std::chrono::steady_clock::now();
 #endif
 
-  integral_value = 0;
-
   double A   = bound_m.first;
   double B   = bound_m.second;
   double fA  = function_m(A);
@@ -53,18 +52,14 @@ void Gstack_integrator::integrate() {
     .sAB = sAB
   };
 
-  gstack = Stack{}; // TODO: is it really necessary? 
-
   /* Initialize global stack with initial entry */
   gstack.push(initial_entry);
 
   /* Vector of application threads */
   std::vector<std::thread> tvec;
 
-  /* 
-   * At this points all counting semaphores
-   * are initialized with value 1.
-   */
+  integral_value = 0;
+  sem_task_present.release();
 
 #ifdef VERBOSE
   std::clog << "Running " << Appl_threads_num << " application threads.\n";
@@ -98,7 +93,7 @@ void Gstack_integrator::integrate() {
 void Gstack_integrator::appl_thread_function() {
 
 #ifdef TIME
-  auto start_time = std::chrono::steady_clock::now();
+  uint64_t elapsed{0};
 #endif
 
   /* While there are entries in global stack */
@@ -115,18 +110,33 @@ void Gstack_integrator::appl_thread_function() {
       break;
     }
 
+    /*
+     * Note: we measure only the period of time from 
+     * start of local stack algorithm in application 
+     * thread till the end of iteration, cause 
+     * otherwise time spend in block waiting for 
+     * the entry in global stack or access to it
+     * will be measured too.   
+     */
+
+#ifdef TIME
+    auto start_time = std::chrono::steady_clock::now();
+#endif 
+
     /* Integrate another period locally */
     integrate_local(entry);
 
     /* Try-populate gstack with terminal periods */
     populate_gstack_terminal();
+
+#ifdef TIME
+    auto stop_time = std::chrono::steady_clock::now();
+    elapsed += 
+      std::chrono::duration_cast<std::chrono::milliseconds> (stop_time - start_time).count();
+#endif 
   }
 
 #ifdef TIME
-
-  auto stop_time = std::chrono::steady_clock::now();
-  auto elapsed 
-    = std::chrono::duration_cast<std::chrono::milliseconds> (stop_time - start_time).count();
   {
     std::lock_guard<std::mutex> io_guard(mtx_io);
 
