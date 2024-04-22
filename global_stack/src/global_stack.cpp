@@ -246,13 +246,13 @@ void Gstack_integrator::populate_gstack(Stack& lstack) {
    * If higher local stack's size boundary is not exceeded,
    * or global stack is not empty, we do not populate gstack
    */
-  if (lstack.size() <= Max_local_sp || !gstack.empty()) {
+  if (lstack.size() < Max_local_sp || !gstack.empty()) {
     return;
   }
 
   VERBOSE_PRINT("Populating gstack");
 
-  while (!lstack.empty()) {
+  for (unsigned int idx = 0; idx < Appl_threads_num; ++idx) {
     /* 
      * Obtain entry from the local 
      * stack and move it tot the global 
@@ -261,6 +261,16 @@ void Gstack_integrator::populate_gstack(Stack& lstack) {
     gstack.push(entry);
     lstack.pop();
   }
+
+  // while (!lstack.empty()) {
+  //   /* 
+  //    * Obtain entry from the local 
+  //    * stack and move it tot the global 
+  //    */
+  //   Entry entry = lstack.top();
+  //   gstack.push(entry);
+  //   lstack.pop();
+  // }
 
   /* Give access to global stack to other threads */ 
   sem_task_present.release();

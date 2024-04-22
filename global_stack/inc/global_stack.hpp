@@ -23,7 +23,7 @@ private:
   static constexpr double Precision = 1E-9;
 
   /* Precision for break condition of integration */
-  static constexpr double Eps = 1E-7;
+  static constexpr double Eps = 1E-3;
 
   /* 
    * Maximum local stack size 
@@ -31,7 +31,7 @@ private:
    * and theres is space available in global stack,
    * entries are moved from local stack to global
    */
-  static constexpr unsigned int Max_local_sp = 4;
+  static constexpr unsigned int Max_local_sp = 8;
 
   struct Entry {
 
