@@ -18,8 +18,11 @@ MPI содержит в своем составе mpd - сервисный пр�
 
 Перед запуском проектов для сборки необходимо установить toolchain **MPI**. 
 
+### 
+
 ### Проекты
-1. [Численное решение уравнения переноса с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/transfer_equation)
-2. [Ускорение подсчёта числа Pi с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/pi_estimation)
-3. [Измерение задержки передачи сообщений между двумя узлами сети с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/comm_delay)
-4. [Базовый пример использования **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/basic)
+1. [Метод глобального стека для параллельного вычисления интеграла с использованием **std::thread**.](https://github.com/RustamSubkhankulov/parprog/tree/main/global_stack)
+2. [Численное решение уравнения переноса с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/transfer_equation)
+3. [Ускорение подсчёта числа Pi с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/pi_estimation)
+4. [Измерение задержки передачи сообщений между двумя узлами сети с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/comm_delay)
+5. [Базовый пример использования **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/basic)

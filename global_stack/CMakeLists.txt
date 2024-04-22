@@ -26,3 +26,8 @@ file(GLOB SOURCES CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
+
+option(VERBOSE "Additional prints of debug information" OFF)
+if (VERBOSE)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE VERBOSE=1)
+endif()

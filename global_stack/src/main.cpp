@@ -11,7 +11,7 @@ int main() {
 
   Gstack_integrator integrator{func, bound};
   integrator.integrate();
-  std::cout << integrator.res() << std::endl;
+  std::cout << "integrator result: " << integrator.res() << std::endl;
 
   return 0;
 }
