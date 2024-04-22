@@ -31,7 +31,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
 
 if(NOT DEFINED NTIMES)
   set(NTIMES 10)
-  message(STATUS "NTIMES is not set, defaulting to 1000")
+  message(STATUS "NTIMES is not set, defaulting to 10")
 endif(NOT DEFINED NTIMES)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE NTIMES=${NTIMES})

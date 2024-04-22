@@ -20,10 +20,10 @@ public:
 private:
 
   /* Precision of double comparison */
-  static constexpr double Precision = 1E-6;
+  static constexpr double Precision = 1E-9;
 
   /* Precision for break condition of integration */
-  static constexpr double Eps = 1E-3;
+  static constexpr double Eps = 1E-6;
 
   /* 
    * Maximum local stack size 
@@ -31,7 +31,7 @@ private:
    * and theres is space available in global stack,
    * entries are moved from local stack to global
    */
-  static constexpr unsigned int Max_local_sp = 2;
+  static constexpr unsigned int Max_local_sp = 5;
 
   struct Entry {
 
@@ -78,7 +78,7 @@ private:
   /* Access to result value of the integral */
   std::mutex mtx_int_val;
 
-#ifdef VERBOSE
+#if defined(VERBOSE) || defined(TIME)
   /* IO mutex */
   std::mutex mtx_io;
 #endif
@@ -147,6 +147,12 @@ private:
    * on application thread end 
    */
   void populate_gstack_terminal();
+
+#ifdef VERBOSE
+  /* Print msg from the application thread locking IO mutex */
+  void appl_thread_print(const std::string& msg);
+#endif
+
 };
 
 }; // namespace GSTACK

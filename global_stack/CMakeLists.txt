@@ -31,3 +31,16 @@ option(VERBOSE "Additional prints of debug information" OFF)
 if (VERBOSE)
   target_compile_definitions(${PROJECT_NAME} PRIVATE VERBOSE=1)
 endif()
+
+option(TIME "Additional prints of elapsed time" OFF)
+if (TIME)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE TIME=1)
+endif()
+
+if(NOT DEFINED NTHREADS)
+  message(STATUS "NTHREADS is not set, defaulting to std::thread::hardware_concurrency()")
+endif(NOT DEFINED NTHREADS)
+
+if (DEFINED NTHREADS)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE NTHREADS=${NTHREADS})
+endif(DEFINED NTHREADS)
