@@ -140,6 +140,7 @@ void Gstack_integrator::appl_thread_function() {
   }
 
   {
+    /* Add local computed values to global one */
     std::lock_guard<std::mutex> integral_value_guard(mtx_integral_value);
     integral_value += integral_value_local;
   }

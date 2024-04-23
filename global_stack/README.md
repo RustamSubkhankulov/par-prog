@@ -129,7 +129,7 @@ void Gstack_integrator::integrate() {
   }
 
   /* Wait for all of the application threads to end */
-  for (auto thread = tvec.begin(); thread != tvec.end(); ++thread) {
+  for (auto thread = tvec.rbegin(); thread != tvec.rend(); ++thread) {
     thread->join();
   }
 
@@ -147,6 +147,8 @@ void Gstack_integrator::appl_thread_function() {
 
   /* ... */ 
 
+  double integral_value_local = 0;
+
   /* While there are entries in global stack */
   while (true) {
 
@@ -161,10 +163,16 @@ void Gstack_integrator::appl_thread_function() {
     /* ... */
 
     /* Integrate another period locally */
-    integrate_local(entry);
+    integrate_local(entry, integral_value_local);
 
     /* Try-populate gstack with terminal periods */
     populate_gstack_terminal();
+  }
+
+  {
+    /* Add local computed values to global one */
+    std::lock_guard<std::mutex> integral_value_guard(mtx_integral_value);
+    integral_value += integral_value_local;
   }
 
   /* ... */
@@ -212,7 +220,7 @@ Integrator result: <Значения интеграла>
 
 | **Число узлов** | **Время, сек** |
 |-----------------|----------------|
-| 2               | 23,120         |
-| 4               | 28,607         |
-| 6               | 34,360         |
-| 8               | 35,128         |
+| 1               | ~10,49         |
+| 2               | ~5,91          |
+| 3               | ~4,43          |
+| 4               | ~5,78          |
