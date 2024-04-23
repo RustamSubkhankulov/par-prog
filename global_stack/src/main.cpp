@@ -8,7 +8,7 @@ using namespace GSTACK;
 int main() {
 
   Gstack_integrator::function func = [](double x) -> double { return std::sin(1./x); };
-  std::pair<double, double> bound = std::make_pair(5E-3, 1.);
+  std::pair<double, double> bound = std::make_pair(1E-5, 1.);
 
   Gstack_integrator integrator{func, bound};
   

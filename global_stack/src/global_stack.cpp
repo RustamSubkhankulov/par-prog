@@ -1,4 +1,5 @@
 #include <cmath>
+#include <mutex>
 #include <thread>
 #include <cstdint>
 #include <iostream>
@@ -74,7 +75,7 @@ void Gstack_integrator::integrate() {
   }
 
   /* Wait for all of the application threads to end */
-  for (auto thread = tvec.begin(); thread != tvec.end(); ++thread) {
+  for (auto thread = tvec.rbegin(); thread != tvec.rend(); ++thread) {
     thread->join();
   }
 
@@ -95,6 +96,8 @@ void Gstack_integrator::appl_thread_function() {
 #ifdef TIME
   uint64_t elapsed{0};
 #endif
+
+  double integral_value_local = 0;
 
   /* While there are entries in global stack */
   while (true) {
@@ -124,7 +127,7 @@ void Gstack_integrator::appl_thread_function() {
 #endif 
 
     /* Integrate another period locally */
-    integrate_local(entry);
+    integrate_local(entry, integral_value_local);
 
     /* Try-populate gstack with terminal periods */
     populate_gstack_terminal();
@@ -134,6 +137,11 @@ void Gstack_integrator::appl_thread_function() {
     elapsed += 
       std::chrono::duration_cast<std::chrono::milliseconds> (stop_time - start_time).count();
 #endif 
+  }
+
+  {
+    std::lock_guard<std::mutex> integral_value_guard(mtx_integral_value);
+    integral_value += integral_value_local;
   }
 
 #ifdef TIME
@@ -177,7 +185,7 @@ Gstack_integrator::Entry Gstack_integrator::get_entry_from_gstack() {
   return entry;
 }
 
-void Gstack_integrator::integrate_local(Entry entry) {
+void Gstack_integrator::integrate_local(Entry entry, double& integral_value_local) {
 
   /* Local stack */
   Stack lstack;
@@ -197,16 +205,8 @@ void Gstack_integrator::integrate_local(Entry entry) {
     /* Desired accuracy is succeded*/
     if (std::abs(entry.sAB - sACB) < Eps * std::abs(sACB)) {
 
-      VERBOSE_PRINT("Precision on period succeded");
-
-      {
-        /* 
-         * Add computation result to the result 
-         * integral value locking mutex 
-         */
-        std::lock_guard<std::mutex> res_guard(mtx_int_val);
-        integral_value += sACB;
-      }
+      VERBOSE_PRINT("Precision on period succeded"); 
+      integral_value_local += sACB;
 
       /* Nothing to integrate in local stack, break */
       if (lstack.empty()) {
@@ -246,13 +246,13 @@ void Gstack_integrator::populate_gstack(Stack& lstack) {
    * If higher local stack's size boundary is not exceeded,
    * or global stack is not empty, we do not populate gstack
    */
-  if (lstack.size() < Max_local_sp || !gstack.empty()) {
+  if (lstack.size() <= Max_local_sp || !gstack.empty()) {
     return;
   }
 
   VERBOSE_PRINT("Populating gstack");
 
-  for (unsigned int idx = 0; idx < Appl_threads_num; ++idx) {
+  while (!lstack.empty()) {
     /* 
      * Obtain entry from the local 
      * stack and move it tot the global 
@@ -261,16 +261,6 @@ void Gstack_integrator::populate_gstack(Stack& lstack) {
     gstack.push(entry);
     lstack.pop();
   }
-
-  // while (!lstack.empty()) {
-  //   /* 
-  //    * Obtain entry from the local 
-  //    * stack and move it tot the global 
-  //    */
-  //   Entry entry = lstack.top();
-  //   gstack.push(entry);
-  //   lstack.pop();
-  // }
 
   /* Give access to global stack to other threads */ 
   sem_task_present.release();

@@ -23,7 +23,7 @@ private:
   static constexpr double Precision = 1E-9;
 
   /* Precision for break condition of integration */
-  static constexpr double Eps = 1E-3;
+  static constexpr double Eps = 1E-6;
 
   /* 
    * Maximum local stack size 
@@ -76,7 +76,7 @@ private:
   std::mutex mtx_gstack;
   
   /* Access to result value of the integral */
-  std::mutex mtx_int_val;
+  std::mutex mtx_integral_value;
 
 #if defined(VERBOSE) || defined(TIME)
   /* IO mutex */
@@ -133,7 +133,7 @@ private:
    * Locally integrate one period in application 
    * thread using modified local stack algorithm 
    */
-  void integrate_local(Entry entry);
+  void integrate_local(Entry entry, double& integral_value_local);
 
   /*
    * Part of the local stack integration algorithm

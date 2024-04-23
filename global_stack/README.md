@@ -107,7 +107,7 @@ private:
   std::mutex mtx_gstack;
   
   /* Access to result value of the integral */
-  std::mutex mtx_int_val;
+  std::mutex mtx_integral_value;
 
   /* ... */
 
