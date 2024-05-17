@@ -182,7 +182,7 @@ void Gstack_integrator::appl_thread_function() {
 #### Сборка
 Для того, чтобы собрать проект, воспользуйтесь следующей коммандой:
 ```
-cmake -b build && cmake --build build --target integrate
+cmake -B build && cmake --build build --target integrate
 ```
 Доступные опции сборки: 
 1. **VERBOSE** - включает дополнительный вывод информации об исполнении потоками алгоритма глобального стека 
