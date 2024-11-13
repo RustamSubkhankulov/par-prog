@@ -4,25 +4,36 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <cstdint>
 
 namespace ALGO
 {
 
 struct subpali_info
 {
-  std::size_t count_odd  = 1U;
-  std::size_t count_even = 0U;
+  std::vector<std::size_t> odd;
+  std::vector<std::size_t> even;
+
+  void reserve(std::size_t new_cap)
+  {
+    odd.reserve(new_cap);
+    even.reserve(new_cap);
+  }
 };
 
 template <typename CharT>
-std::vector<subpali_info> find_subpalindromes_trivial(const std::basic_string<CharT>& source)
+subpali_info find_subpalindromes_trivial(const std::basic_string<CharT>& source)
 {
-  std::size_t len = source.size();
-  std::vector<subpali_info> results(len);
+  auto len = source.size();
 
+  subpali_info results;
+  results.odd  = std::vector<std::size_t>(len, 1);
+  results.even = std::vector<std::size_t>(len, 0);
+
+  // Odd-length subpalindromes
   for (std::size_t idx = 0U; idx != len; ++idx)
   {
-    auto& count_odd = results[idx].count_odd;
+    auto& count_odd = results.odd[idx];
 
     while (idx >= count_odd && idx + count_odd < len
            && source[idx - count_odd] == source[idx + count_odd])
@@ -31,12 +42,13 @@ std::vector<subpali_info> find_subpalindromes_trivial(const std::basic_string<Ch
     }
   }
 
+  // Even-length subpalindromes
   for (std::size_t idx = 0U; idx != len; ++idx)
   {
-    auto& count_even = results[idx].count_even;
+    auto& count_even = results.even[idx];
 
     while (idx >= count_even + 1U && idx + count_even < len
-           && source[idx - count_even + 1U] == source[idx + count_even])
+           && source[idx - count_even - 1U] == source[idx + count_even])
     {
       ++count_even;
     }
@@ -46,9 +58,64 @@ std::vector<subpali_info> find_subpalindromes_trivial(const std::basic_string<Ch
 }
 
 template <typename CharT>
-std::vector<subpali_info> find_subpalindromes_manaker(const std::basic_string<CharT>& source)
+subpali_info find_subpalindromes_manaker(const std::basic_string<CharT>& source)
 {
-  return std::vector<subpali_info>{};
+  subpali_info results;
+  results.reserve(source.size());
+
+  auto num = static_cast<intmax_t>(source.size());
+
+  // Odd-length subpalindromes
+  {
+    // Left and right borders of the rightmost subpalindrome
+    intmax_t l = 0, r = -1;
+
+    for (intmax_t idx = 0; idx < num; ++idx)
+    {
+      intmax_t k =
+        (idx > r) ? 1 : std::min(static_cast<intmax_t>(results.odd[l + r - idx]), r - idx + 1);
+
+      while (idx + k < num && idx >= k && source[idx + k] == source[idx - k])
+      {
+        ++k;
+      }
+
+      results.odd[idx] = k;
+      if (idx + k - 1 > r)
+      {
+        // Update left and right borders
+        l = idx - k + 1;
+        r = idx + k - 1;
+      }
+    }
+  }
+
+  // Even-length subpalindromes
+  {
+    // Left and right borders of the rightmost subpalindrome
+    intmax_t l = 0, r = -1;
+
+    for (intmax_t idx = 0; idx < num; ++idx)
+    {
+      intmax_t k =
+        (idx > r) ? 0 : std::min(static_cast<intmax_t>(results.even[l + r - idx + 1]), r - idx + 1);
+
+      while (idx + k < num && idx >= k + 1 && source[idx + k] == source[idx - k - 1])
+      {
+        ++k;
+      }
+
+      results.even[idx] = k;
+      if (idx + k - 1 > r)
+      {
+        // Update left and right borders
+        l = idx - k;
+        r = idx + k - 1;
+      }
+    }
+  }
+
+  return results;
 }
 
 } // namespace ALGO

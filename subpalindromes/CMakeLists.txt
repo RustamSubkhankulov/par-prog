@@ -26,20 +26,22 @@ set(INC_DIR inc)
 
 file(GLOB SOURCES CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
+add_executable(manaker ${SOURCES})
+
+add_executable(trivial ${SOURCES})
+target_compile_definitions(trivial PRIVATE TRIVIAL=1)
+
+target_include_directories(manaker PRIVATE ${INC_DIR})
+target_include_directories(trivial PRIVATE ${INC_DIR})
 
 option(VERBOSE "Additional prints of debug information" OFF)
 if (VERBOSE)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE VERBOSE=1)
+  target_compile_definitions(manaker PRIVATE VERBOSE=1)
+  target_compile_definitions(trivial VERBOSE=1)
 endif()
 
 option(TIME "Additional prints of elapsed time" OFF)
 if (TIME)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE TIME=1)
-endif()
-
-option(TRIVIAL "Use trivial algorithm to find subalindromes" OFF)
-if (TRIVIAL)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE TRIVIAL=1)
+  target_compile_definitions(manaker PRIVATE TIME=1)
+  target_compile_definitions(trivial PRIVATE TIME=1)
 endif()
