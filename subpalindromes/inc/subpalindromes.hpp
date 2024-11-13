@@ -9,48 +9,38 @@
 namespace ALGO
 {
 
-struct subpali_info
+struct subpali_info_pos
 {
-  std::vector<std::size_t> odd;
-  std::vector<std::size_t> even;
-
-  void reserve(std::size_t new_cap)
-  {
-    odd.reserve(new_cap);
-    even.reserve(new_cap);
-  }
+  std::size_t odd;
+  std::size_t even;
 };
+
+using subpali_info = std::vector<subpali_info_pos>;
 
 template <typename CharT>
 subpali_info find_subpalindromes_trivial(const std::basic_string<CharT>& source)
 {
   auto len = source.size();
+  subpali_info results(len);
 
-  subpali_info results;
-  results.odd  = std::vector<std::size_t>(len, 1);
-  results.even = std::vector<std::size_t>(len, 0);
-
-  // Odd-length subpalindromes
+#pragma omp parallel default(none) shared(results, len, source)
   for (std::size_t idx = 0U; idx != len; ++idx)
   {
-    auto& count_odd = results.odd[idx];
+    results[idx].odd  = 1U;
+    results[idx].even = 0U;
 
-    while (idx >= count_odd && idx + count_odd < len
-           && source[idx - count_odd] == source[idx + count_odd])
+    // Odd-length subpalindromes
+    while (idx >= results[idx].odd && idx + results[idx].odd < len
+           && source[idx - results[idx].odd] == source[idx + results[idx].odd])
     {
-      ++count_odd;
+      ++results[idx].odd;
     }
-  }
 
-  // Even-length subpalindromes
-  for (std::size_t idx = 0U; idx != len; ++idx)
-  {
-    auto& count_even = results.even[idx];
-
-    while (idx >= count_even + 1U && idx + count_even < len
-           && source[idx - count_even - 1U] == source[idx + count_even])
+    // Even-length subpalindromes
+    while (idx >= results[idx].even + 1U && idx + results[idx].even < len
+           && source[idx - results[idx].even - 1U] == source[idx + results[idx].even])
     {
-      ++count_even;
+      ++results[idx].even;
     }
   }
 
@@ -73,14 +63,14 @@ subpali_info find_subpalindromes_manaker(const std::basic_string<CharT>& source)
     for (intmax_t idx = 0; idx < num; ++idx)
     {
       intmax_t k =
-        (idx > r) ? 1 : std::min(static_cast<intmax_t>(results.odd[l + r - idx]), r - idx + 1);
+        (idx > r) ? 1 : std::min(static_cast<intmax_t>(results[l + r - idx].odd), r - idx + 1);
 
       while (idx + k < num && idx >= k && source[idx + k] == source[idx - k])
       {
         ++k;
       }
 
-      results.odd[idx] = k;
+      results[idx].odd = k;
       if (idx + k - 1 > r)
       {
         // Update left and right borders
@@ -98,14 +88,14 @@ subpali_info find_subpalindromes_manaker(const std::basic_string<CharT>& source)
     for (intmax_t idx = 0; idx < num; ++idx)
     {
       intmax_t k =
-        (idx > r) ? 0 : std::min(static_cast<intmax_t>(results.even[l + r - idx + 1]), r - idx + 1);
+        (idx > r) ? 0 : std::min(static_cast<intmax_t>(results[l + r - idx + 1].even), r - idx + 1);
 
       while (idx + k < num && idx >= k + 1 && source[idx + k] == source[idx - k - 1])
       {
         ++k;
       }
 
-      results.even[idx] = k;
+      results[idx].even = k;
       if (idx + k - 1 > r)
       {
         // Update left and right borders

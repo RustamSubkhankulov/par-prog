@@ -4,6 +4,11 @@
 #include <cstdint>
 #include <algorithm>
 
+#ifdef PARALLEL
+#include <thread>
+#include <omp.h>
+#endif
+
 #include "subpalindromes.hpp"
 
 int main()
@@ -21,6 +26,11 @@ int main()
   std::cout << "Source string: " << source << std::endl;
 #endif
 
+#ifdef PARALLEL
+  // Set number of threads for OpenMP
+  omp_set_num_threads(static_cast<int>(std::thread::hardware_concurrency()));
+#endif
+
   // Main call
 #ifdef TRIVIAL
   auto result = ALGO::find_subpalindromes_trivial(source);
@@ -32,8 +42,8 @@ int main()
   for (std::size_t pos = 0U; pos != source.size(); ++pos)
   {
     std::cout << "Position " << pos << std::endl;
-    std::cout << "Odd-length subpalindromes count: " << result.odd[pos] << std::endl;
-    std::cout << "Even-length subpalindromes count: " << result.even[pos] << std::endl;
+    std::cout << "Odd-length subpalindromes count: " << result[pos].odd << std::endl;
+    std::cout << "Even-length subpalindromes count: " << result[pos].even << std::endl;
     std::cout << std::endl;
   }
 

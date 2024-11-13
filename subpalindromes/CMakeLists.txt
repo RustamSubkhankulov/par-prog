@@ -1,3 +1,4 @@
+set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
 cmake_minimum_required(VERSION 3.21)
 
 project(
@@ -26,22 +27,29 @@ set(INC_DIR inc)
 
 file(GLOB SOURCES CONFIGURE_DEPENDS ${SRC_DIR}/*.cpp)
 
+#----MANAKER----
 add_executable(manaker ${SOURCES})
 
+#----TRIVIAL----
 add_executable(trivial ${SOURCES})
 target_compile_definitions(trivial PRIVATE TRIVIAL=1)
 
-target_include_directories(manaker PRIVATE ${INC_DIR})
-target_include_directories(trivial PRIVATE ${INC_DIR})
+#---PARALLEL----
+add_executable(parallel ${SOURCES})
+target_compile_options(parallel PUBLIC "-fopenmp")
+target_link_options(parallel PUBLIC "-fopenmp")
+target_compile_definitions(parallel PRIVATE TRIVIAL=1 PARALLEL=1)
+
+#----COMMON-----
+set(target_list manaker trivial parallel)
+
+foreach(TARGET ${target_list})
+  target_include_directories(${TARGET} PRIVATE ${INC_DIR})
+endforeach(TARGET)
 
 option(VERBOSE "Additional prints of debug information" OFF)
 if (VERBOSE)
-  target_compile_definitions(manaker PRIVATE VERBOSE=1)
-  target_compile_definitions(trivial VERBOSE=1)
-endif()
-
-option(TIME "Additional prints of elapsed time" OFF)
-if (TIME)
-  target_compile_definitions(manaker PRIVATE TIME=1)
-  target_compile_definitions(trivial PRIVATE TIME=1)
+  foreach(TARGET ${target_list})
+    target_compile_definitions(${TARGET} PRIVATE VERBOSE=1)
+  endforeach(TARGET)
 endif()
