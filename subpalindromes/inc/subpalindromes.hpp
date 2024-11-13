@@ -24,6 +24,7 @@ subpali_info find_subpalindromes_trivial(const std::basic_string<CharT>& source)
   subpali_info results(len);
 
 #pragma omp parallel default(none) shared(results, len, source)
+  #pragma omp for
   for (std::size_t idx = 0U; idx != len; ++idx)
   {
     results[idx].odd  = 1U;

@@ -1,4 +1,3 @@
-set(CMAKE_CXX_COMPILER "/opt/homebrew/opt/llvm/bin/clang++")
 cmake_minimum_required(VERSION 3.21)
 
 project(
@@ -53,3 +52,11 @@ if (VERBOSE)
     target_compile_definitions(${TARGET} PRIVATE VERBOSE=1)
   endforeach(TARGET)
 endif()
+
+option(QUIET "Do not print anything to stdout. This includes both debug info and results showing" ON)
+if (QUIET)
+  foreach(TARGET ${target_list})
+    target_compile_definitions(${TARGET} PRIVATE QUIET=1)
+  endforeach(TARGET)
+endif()
+

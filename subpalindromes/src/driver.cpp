@@ -4,11 +4,6 @@
 #include <cstdint>
 #include <algorithm>
 
-#ifdef PARALLEL
-#include <thread>
-#include <omp.h>
-#endif
-
 #include "subpalindromes.hpp"
 
 int main()
@@ -22,27 +17,38 @@ int main()
     return EXIT_FAILURE;
   }
 
-#ifdef VERBOSE
+#if defined(VERBOSE) && !defined(QUIET)
   std::cout << "Source string: " << source << std::endl;
 #endif
 
-#ifdef PARALLEL
-  // Set number of threads for OpenMP
-  omp_set_num_threads(static_cast<int>(std::thread::hardware_concurrency()));
-#endif
-
-  // Main call
-#ifdef TRIVIAL
+#if defined(TRIVIAL) && !defined(QUIET)
+  
+  // Trivial algorithm, with results showing.
   auto result = ALGO::find_subpalindromes_trivial(source);
-#else
+
+#elif defined(TRIVIAL)
+
+  // Trivial algorithm, no results showing.
+  ALGO::find_subpalindromes_trivial(source);
+
+#elif !defined(QUIET)
+
+  // Manaker's algorithm, with results showing.
   auto result = ALGO::find_subpalindromes_manaker(source);
+
+#else
+
+  // Manaker's algorithm, no results showing.
+  ALGO::find_subpalindromes_manaker(source);
 #endif
 
+#ifndef QUIET
   // Show results
   for (const auto& pos : result)
   {
     std::cout << pos.odd << " " << pos.even << std::endl;
   }
+#endif
 
   return 0;
 }
