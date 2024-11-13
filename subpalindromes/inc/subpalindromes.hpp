@@ -50,9 +50,7 @@ subpali_info find_subpalindromes_trivial(const std::basic_string<CharT>& source)
 template <typename CharT>
 subpali_info find_subpalindromes_manaker(const std::basic_string<CharT>& source)
 {
-  subpali_info results;
-  results.reserve(source.size());
-
+  subpali_info results(source.size());
   auto num = static_cast<intmax_t>(source.size());
 
   // Odd-length subpalindromes

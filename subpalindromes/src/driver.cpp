@@ -39,12 +39,9 @@ int main()
 #endif
 
   // Show results
-  for (std::size_t pos = 0U; pos != source.size(); ++pos)
+  for (const auto& pos : result)
   {
-    std::cout << "Position " << pos << std::endl;
-    std::cout << "Odd-length subpalindromes count: " << result[pos].odd << std::endl;
-    std::cout << "Even-length subpalindromes count: " << result[pos].even << std::endl;
-    std::cout << std::endl;
+    std::cout << pos.odd << " " << pos.even << std::endl;
   }
 
   return 0;
