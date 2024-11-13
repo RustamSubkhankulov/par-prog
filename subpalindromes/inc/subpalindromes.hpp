@@ -10,7 +10,7 @@ namespace ALGO
 
 struct subpali_info
 {
-  std::size_t count_odd = 1U;
+  std::size_t count_odd  = 1U;
   std::size_t count_even = 0U;
 };
 
@@ -23,9 +23,9 @@ std::vector<subpali_info> find_subpalindromes_trivial(const std::basic_string<Ch
   for (std::size_t idx = 0U; idx != len; ++idx)
   {
     auto& count_odd = results[idx].count_odd;
-    
-    while (idx >= count_odd && idx + count_odd < len 
-      && source[idx - count_odd] == source[idx + count_odd])
+
+    while (idx >= count_odd && idx + count_odd < len
+           && source[idx - count_odd] == source[idx + count_odd])
     {
       ++count_odd;
     }
@@ -35,8 +35,8 @@ std::vector<subpali_info> find_subpalindromes_trivial(const std::basic_string<Ch
   {
     auto& count_even = results[idx].count_even;
 
-    while (idx >= count_even + 1U && idx + count_even < len 
-      && source[idx - count_even + 1U] == source[idx + count_even])
+    while (idx >= count_even + 1U && idx + count_even < len
+           && source[idx - count_even + 1U] == source[idx + count_even])
     {
       ++count_even;
     }
@@ -51,6 +51,6 @@ std::vector<subpali_info> find_subpalindromes_manaker(const std::basic_string<Ch
   return std::vector<subpali_info>{};
 }
 
-} /* namespace ::ALGO */
+} // namespace ALGO
 
 #endif /* SUBPALINDROMES_HPP */

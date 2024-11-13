@@ -10,9 +10,9 @@ static void showHelp();
 
 int main(const int argc, const char* const argv[])
 {
-  // Read source string, where we will search for the palindromes 
+  // Read source string, where we will search for the palindromes
   std::string source = getSource(argc, argv);
-  
+
 #ifdef VERBOSE
   std::cout << "Source string: " << source << std::endl;
 #endif
@@ -36,7 +36,7 @@ int main(const int argc, const char* const argv[])
   return 0;
 }
 
-// Checks 'argc' and 'argv' and returns source string, 
+// Checks 'argc' and 'argv' and returns source string,
 // where palindromes are to find
 static std::string getSource(const int argc, const char* const argv[])
 {
