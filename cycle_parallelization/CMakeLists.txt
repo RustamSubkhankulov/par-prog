@@ -26,6 +26,8 @@ set(INC_DIR inc)
 
 set(target_list task01 task02 task03)
 
+#------COMMON------
+
 foreach(TARGET ${target_list})
   add_executable(${TARGET} ${SRC_DIR}/${TARGET}.cpp)
   target_include_directories(${TARGET} PUBLIC ${INC_DIR})
@@ -44,3 +46,8 @@ foreach(TARGET ${target_list})
     endif()
   endforeach(OPTION)
 endforeach(TARGET)
+
+#------TASK01------
+
+target_compile_options(task01 PUBLIC "-fopenmp")
+target_link_options(task01 PUBLIC "-fopenmp")

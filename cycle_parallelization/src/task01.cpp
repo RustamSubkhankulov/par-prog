@@ -12,14 +12,14 @@ namespace
 /* Array dimensions. */
 const int Isize = 40000;
 const int Jsize = 40000;
-} // namespace
+} /* anonymous namespace */
 
 int main()
 {
   using column = double[Jsize];
   auto a       = new column[Isize];
 
-  /* Preparing - fill array with some data. */
+  /* Preparation - fill array with some data. */
   for (int i = 0; i < Isize; i++)
   {
     for (int j = 0; j < Jsize; j++)
@@ -34,6 +34,8 @@ int main()
 #endif /* TIMING */
 
   /* Main computational cycle. */
+  #pragma omp parallel default(none) shared(a, Isize, Jsize)
+  #pragma omp for schedule(static)
   for (int i = 0; i < Isize; i++)
   {
     for (int j = 0; j < Jsize; j++)
