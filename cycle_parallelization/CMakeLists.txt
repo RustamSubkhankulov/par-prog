@@ -21,33 +21,5 @@ if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "CMAKE_BUILD_TYPE is not specified, using Release by default")
 endif()
 
-set(SRC_DIR src)
-set(INC_DIR inc)
-
-set(target_list task01 task02 task03)
-
-#------COMMON------
-
-foreach(TARGET ${target_list})
-  add_executable(${TARGET} ${SRC_DIR}/${TARGET}.cpp)
-  target_include_directories(${TARGET} PUBLIC ${INC_DIR})
-endforeach(TARGET)
-
-option(PARALLEL "Parallel version of the programm" OFF)
-option(TIMING "Measure execution time" OFF)
-option(QUIET "Disable result printing" OFF)
-
-set(options_list PARALLEL TIMING QUIET)
-
-foreach(TARGET ${target_list})
-  foreach(OPTION ${options_list})
-    if (${OPTION})
-      target_compile_definitions(${TARGET} PRIVATE ${OPTION}=1)
-    endif()
-  endforeach(OPTION)
-endforeach(TARGET)
-
-#------TASK01------
-
-target_compile_options(task01 PUBLIC "-fopenmp")
-target_link_options(task01 PUBLIC "-fopenmp")
+add_subdirectory(omp)
+add_subdirectory(mpi)
