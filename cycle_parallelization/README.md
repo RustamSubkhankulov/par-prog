@@ -186,8 +186,8 @@ for (int i = 0; i < Isize; i++)
 |-----------|------|-----|-----|-----|-----|-----|-----|-----|-----|-----|------|
 | time      | 11,2 | 6,4 | 4,5 | 3,3 | 3,6 | 3,3 | 3,3 | 3,5 | 3,4 | 3,3 | 3,4  |
 
-<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/pic/graph01_T.png" alt="time(p)" width="450"/>
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/pic/graph01_T.png" alt="time(p)" width="700"/>
 
-<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/pic/graph01_S.png" alt="time(p)" width="450"/>
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/pic/graph01_S.png" alt="time(p)" width="700"/>
 
-<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/pic/graph01_E.png" alt="time(p)" width="450"/>
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/pic/graph01_E.png" alt="time(p)" width="700"/>
