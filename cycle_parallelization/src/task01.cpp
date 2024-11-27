@@ -1,21 +1,25 @@
-#include <cstdio>
-#include <cstdlib>
+#include <iostream>
+#include <fstream>
 #include <cmath>
 #include <cassert>
 
+#ifdef TIMING
+#include "stopwatch.hpp"
+#endif /* TIMING */
+
 namespace
 {
-  const int Isize = 1000;
-  const int Jsize = 1000;
-
-  const char* Result_filename = "result.txt";
-}
+/* Array dimensions. */
+const int Isize = 40000;
+const int Jsize = 40000;
+} // namespace
 
 int main()
 {
-  double a[Isize][Jsize];
+  using column = double[Jsize];
+  auto a       = new column[Isize];
 
-  //подготовительная часть – заполнение некими данными
+  /* Preparing - fill array with some data. */
   for (int i = 0; i < Isize; i++)
   {
     for (int j = 0; j < Jsize; j++)
@@ -24,7 +28,12 @@ int main()
     }
   }
 
-  // требуется обеспечить измерение времени работы данного цикла
+#ifdef TIMING
+  UTILS::stopwatch sw;
+  sw.start();
+#endif /* TIMING */
+
+  /* Main computational cycle. */
   for (int i = 0; i < Isize; i++)
   {
     for (int j = 0; j < Jsize; j++)
@@ -33,19 +42,24 @@ int main()
     }
   }
 
-  FILE* ff = fopen(Result_filename, "w");
-  assert(ff != NULL);
-  
-  for(int i = 0; i < Isize; i++)
+#ifdef TIMING
+  std::clog << "Total elapsed: " << sw.stop() / 1000. << " sec \n";
+#endif /* TIMING */
+
+#ifndef QUIET
+  auto result_file = std::ofstream("result.txt");
+  assert(result_file.is_open());
+
+  for (int i = 0; i < Isize; i++)
   {
     for (int j = 0; j < Jsize; j++)
     {
-      fprintf(ff,"%f ",a[i][j]);
+      result_file << a[i][j] << ' ';
     }
-    
-    fprintf(ff,"\n");
+
+    result_file << std::endl;
   }
-  
-  int res = fclose(ff);
-  assert(res == 0);
+#endif /* !QUIET */
+
+  delete[] a;
 }

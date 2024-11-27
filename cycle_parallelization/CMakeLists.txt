@@ -22,22 +22,25 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(SRC_DIR src)
+set(INC_DIR inc)
+
 set(target_list task01 task02 task03)
 
 foreach(TARGET ${target_list})
   add_executable(${TARGET} ${SRC_DIR}/${TARGET}.cpp)
+  target_include_directories(${TARGET} PUBLIC ${INC_DIR})
 endforeach(TARGET)
 
 option(PARALLEL "Parallel version of the programm" OFF)
-if (PARALLEL)
-  foreach(TARGET ${target_list})
-    target_compile_definitions(${TARGET} PRIVATE PARALLEL=1)
-  endforeach(TARGET)
-endif()
-
 option(TIMING "Measure execution time" OFF)
-if (TIMING)
-  foreach(TARGET ${target_list})
-    target_compile_definitions(${TARGET} PRIVATE TIMING=1)
-  endforeach(TARGET)
-endif()
+option(QUIET "Disable result printing" OFF)
+
+set(options_list PARALLEL TIMING QUIET)
+
+foreach(TARGET ${target_list})
+  foreach(OPTION ${options_list})
+    if (${OPTION})
+      target_compile_definitions(${TARGET} PRIVATE ${OPTION}=1)
+    endif()
+  endforeach(OPTION)
+endforeach(TARGET)
