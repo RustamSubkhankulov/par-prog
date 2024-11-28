@@ -1,23 +1,27 @@
-#include <iostream>
-#include <fstream>
 #include <cmath>
-#include <cassert>
 
 #ifdef TIMING
+#include <iostream>
 #include "stopwatch.hpp"
-#endif /* TIMING */
+#endif
+
+#ifndef QUIET
+#include <fstream>
+#include <cassert>
+#endif
 
 namespace
 {
 /* Array dimensions. */
 const int Isize = 40000;
 const int Jsize = 40000;
+
+using column = double[Jsize];
 } /* anonymous namespace */
 
 int main()
 {
-  using column = double[Jsize];
-  auto a       = new column[Isize];
+  auto a = new column[Isize];
 
   /* Preparation - fill array with some data. */
   for (int i = 0; i < Isize; i++)
@@ -31,11 +35,11 @@ int main()
 #ifdef TIMING
   UTILS::stopwatch sw;
   sw.start();
-#endif /* TIMING */
+#endif
 
-  /* Main computational cycle. */
-  #pragma omp parallel default(none) shared(a, Isize, Jsize)
-  #pragma omp for schedule(static)
+/* Main computational cycle. */
+#pragma omp parallel default(none) shared(a, Isize, Jsize)
+#pragma omp for schedule(static)
   for (int i = 0; i < Isize; i++)
   {
     for (int j = 0; j < Jsize; j++)
@@ -45,8 +49,8 @@ int main()
   }
 
 #ifdef TIMING
-  std::clog << "Total elapsed: " << sw.stop() / 1000. << " sec \n";
-#endif /* TIMING */
+  std::clog << "Total elapsed: " << sw.stop() << " sec \n";
+#endif
 
 #ifndef QUIET
   auto result_file = std::ofstream("result.txt");

@@ -1,6 +1,12 @@
 set(SRC_DIR src)
 set(INC_DIR inc)
 
+#-----------
+# Host only |
+#-----------
+set(CMAKE_CXX_COMPILER /opt/homebrew/opt/llvm/bin/clang++)
+#-----------
+
 set(target_list task01)
 
 #------COMMON------
