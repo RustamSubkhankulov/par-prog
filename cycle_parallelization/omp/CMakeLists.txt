@@ -5,16 +5,19 @@ set(target_list task01)
 
 #------COMMON------
 
+option(PARALLEL "Parallel version of the programm" OFF)
+
 foreach(TARGET ${target_list})
   set (TARGET_NAME ${TARGET}_OMP)
   add_executable(${TARGET_NAME} ${SRC_DIR}/${TARGET}.cpp)
   target_include_directories(${TARGET_NAME} PUBLIC ${INC_DIR})
 
-  target_compile_options(${TARGET_NAME} PUBLIC "-fopenmp")
-  target_link_options(${TARGET_NAME} PUBLIC "-fopenmp")
+  if (PARALLEL)
+    target_compile_options(${TARGET_NAME} PUBLIC "-fopenmp")
+    target_link_options(${TARGET_NAME} PUBLIC "-fopenmp")
+  endif(PARALLEL)
 endforeach(TARGET)
 
-option(PARALLEL "Parallel version of the programm" OFF)
 option(TIMING "Measure execution time" OFF)
 option(QUIET "Disable result printing" OFF)
 
