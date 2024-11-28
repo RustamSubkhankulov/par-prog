@@ -13,8 +13,8 @@
 namespace
 {
 /* Array dimensions. */
-const int Isize = 5000;
-const int Jsize = 5000;
+const int Isize = 40000;
+const int Jsize = 40000;
 
 using row = double[Jsize + 3];
 } /* anonymous namespace */
@@ -57,6 +57,8 @@ int main()
 
   for (int i = 4; i < Isize; ++i)
   {
+    #pragma omp parallel default(none) shared(a, i)
+    #pragma omp for
     for (int j = 0; j < Jsize - 3; ++j)
     {
       a[i][j + 3] = sin(5 * a[i - 2][j + 6]);

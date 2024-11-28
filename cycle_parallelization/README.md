@@ -291,3 +291,85 @@ int main()
 Вектор направлений - _d_ = (">"; "<").
 
 Такой цикл может быть распараллелен по индексам, соответствующим компонентам «>» в векторе направлений, при дублировании необходимых входных данных.
+
+#### Паралельная версия программы с использованием технологии *OpenMP*.
+
+```cpp
+#include <cmath>
+/* includes */
+
+namespace
+{
+/* Array dimensions. */
+const int Isize = 40000;
+const int Jsize = 40000;
+
+using row = double[Jsize + 3];
+} /* anonymous namespace */
+
+int main()
+{
+  auto a = new row[Isize];
+
+  /* Preparation - fill array with some data. */
+  for (int i = 0; i < Isize; ++i)
+  {
+    for (int j = 0; j < Jsize; ++j)
+    {
+      a[i][j] = 10 * i + j;
+    }
+  }
+
+  /* Time mesurement starts. */
+
+  /* Duplicate data for extra columns. */
+  for (int i = 0; i < Isize; ++i)
+  {
+    for (int j = Jsize; j < Jsize + 3; ++j)
+    {
+      a[i][j] = a[i][j - 3];
+    }
+  }
+
+  /* Main computations. */
+  for (int i = 2; i < 4; ++i)
+  {
+    for (int j = 0; j < Jsize - 3; ++j)
+    {
+      a[i][j + 3] = 2 * a[i - 2][j + 3];
+    }
+  }
+
+  for (int i = 4; i < Isize; ++i)
+  {
+    #pragma omp parallel default(none) shared(a, i)
+    #pragma omp for
+    for (int j = 0; j < Jsize - 3; ++j)
+    {
+      a[i][j + 3] = sin(5 * a[i - 2][j + 6]);
+    }
+  }
+
+  /* Time mesurement stops. Results are written to file. */
+
+  delete[] a;
+}
+```
+
+Зависимость времени вычисления от количества исполнителей приведена в таблице:
+
+|           | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    |
+|-----------|------|------|------|------|------|------|------|------|
+| time      | 8,35 | 5,19 | 5,02 | 4,01 | 4,96 | 5,13 | 5,18 | 5,26 |
+
+График зависимости времени исполнения от количества исполнителей:
+
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph02_T.png" alt="task02 time(p)" width="700"/>
+
+График зависимости величины ускорения от количества исполнителей:
+
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph02_S.png" alt="task02 S(p)" width="700"/>
+
+График зависимости величины эффективности от количества исполнителей:
+
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph02_E.png" alt="task02 E(p)" width="700"/>
