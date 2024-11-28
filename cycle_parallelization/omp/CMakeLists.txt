@@ -1,7 +1,7 @@
 set(SRC_DIR src)
 set(INC_DIR inc)
 
-set(target_list task01)
+set(target_list task01 task02)
 
 #------COMMON------
 
