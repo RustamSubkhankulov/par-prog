@@ -9,7 +9,7 @@ set(target_list task01)
 
 foreach(TARGET ${target_list})
   set (TARGET_NAME ${TARGET}_MPI)
-  add_executable(${TARGET_NAME} ${SRC_DIR}/${TARGET}.cpp)
+  add_executable(${TARGET_NAME} ${SRC_DIR}/${TARGET}.cpp ${SRC_DIR}/mpi_support.cpp)
   target_include_directories(${TARGET_NAME} PUBLIC ${INC_DIR})
 endforeach(TARGET)
 

@@ -30,22 +30,21 @@ void main_process_prepare(double (*a)[Jsize])
   }
 }
 
-void main_process_send(int cluster_size, int secondary_rank, const double (*array)[Jsize])
+void main_process_send(int cluster_size, int rank, const double (*array)[Jsize])
 {
-  int idx_start = cluster_size * (secondary_rank - 1);
+  int idx_start = cluster_size * (rank - 1);
   int idx_end   = idx_start + cluster_size;
 
   for (int idx = idx_start; idx < idx_end; ++idx)
   {
-    int res =
-      MPI_Send(&array[idx], Jsize, MPI_DOUBLE, secondary_rank, MPI::Msg_tag, MPI_COMM_WORLD);
+    int res = MPI_Send(&array[idx], Jsize, MPI_DOUBLE, rank, MPI::Msg_tag, MPI_COMM_WORLD);
     MPI::exit_on_mpi_failure(res);
   }
 }
 
-void main_process_recv(int cluster_size, int secondary_rank, double (*array)[Jsize])
+void main_process_recv(int cluster_size, int rank, double (*array)[Jsize])
 {
-  int idx_start = cluster_size * (secondary_rank - 1);
+  int idx_start = cluster_size * (rank - 1);
   int idx_end   = idx_start + cluster_size;
 
   for (int idx = idx_start; idx < idx_end; ++idx)
@@ -54,7 +53,7 @@ void main_process_recv(int cluster_size, int secondary_rank, double (*array)[Jsi
       &array[idx],
       Jsize,
       MPI_DOUBLE,
-      secondary_rank,
+      rank,
       MPI::Msg_tag,
       MPI_COMM_WORLD,
       MPI_STATUS_IGNORE);
@@ -105,15 +104,15 @@ void main_process(int comm_size)
   int cluster_size = Isize / (comm_size - 1);
 
   /* Send data for computations to the secondary processes. */
-  for (int secondary_rank = 1; secondary_rank < comm_size; ++secondary_rank)
+  for (int rank = 1; rank < comm_size; ++rank)
   {
-    main_process_send(cluster_size, secondary_rank, array);
+    main_process_send(cluster_size, rank, array);
   }
 
   /* Receive computation results from the secondary processes. */
-  for (int secondary_rank = 1; secondary_rank < comm_size; ++secondary_rank)
+  for (int rank = 1; rank < comm_size; ++rank)
   {
-    main_process_recv(cluster_size, secondary_rank, array);
+    main_process_recv(cluster_size, rank, array);
   }
 
 #ifdef TIMING
@@ -144,7 +143,7 @@ void secondary_process_send(int cluster_size, const double (*array)[Jsize])
   }
 }
 
-void secondary_process(int comm_size, int secondary_rank)
+void secondary_process(int comm_size)
 {
   /* Cluster size - number of rows per process. */
   int cluster_size = Isize / (comm_size - 1);
@@ -169,27 +168,41 @@ void secondary_process(int comm_size, int secondary_rank)
 
 } /* anonymous namespace */
 
-int main(int argc, const char* const* argv)
+int main(int argc, char** argv)
 {
   /* MPI env initialization. */
-  MPI_env mpi_env;
+  MPI::MPI_env mpi_env(argc, argv);
 
   /* Total number of the processes in the communicator. */
   int comm_size;
-  res = MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
+  int res = MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
   MPI::exit_on_mpi_failure(res);
-
-  /* We support 2+ processes in the communicator. */
-  if (comm_size < 2)
-  {
-    std::cerr << "Communicator size " << comm_size << " is too small. Terminating.\n";
-    return EXIT_FAILURE;
-  }
 
   /* Processes rank. */
   int rank;
   res = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI::exit_on_mpi_failure(res);
+
+  /* We support 2+ processes in the communicator. */
+  if (comm_size < 2)
+  {
+    if (rank == 0)
+    {
+      std::cerr << "Communicator size " << comm_size << " is too small. Terminating.\n";
+    }
+    return EXIT_FAILURE;
+  }
+
+  /* Number of rows must be divisible by number of secondary processes. */
+  if (Isize % (comm_size - 1) != 0)
+  {
+    if (rank == 0)
+    {
+      std::cerr << "Total number of rows " << Isize << " cannot be divided among "
+                << (comm_size - 1) << std::endl;
+    }
+    return EXIT_FAILURE;
+  }
 
   if (rank == 0)
   {
@@ -199,7 +212,7 @@ int main(int argc, const char* const* argv)
   else
   {
     /* Secondary process for all other ranks. */
-    secondary_process(comm_size, rank);
+    secondary_process(comm_size);
   }
 
   /* Impiclit MPI env finalization via 'MPI_env' dtor. */

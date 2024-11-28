@@ -34,9 +34,9 @@ void exit_on_mpi_failure(
   const int res,
   const std::source_location& sloc = std::source_location::current());
 
-class MPI_env
+struct MPI_env
 {
-  MPI_env(int argc, const char* const* argv)
+  MPI_env(int argc, char** argv)
   {
     /* MPI env initialization. */
     int res = MPI_Init(&argc, &argv);
