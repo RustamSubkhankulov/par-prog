@@ -115,7 +115,7 @@ for (int j1=0; j1<j_fin1; ++j1) {
 
 Основным заданием данной лабораторной работы является разработка и исследование параллельных программ, созданных на основе существующих заготовок последовательных программ. Полученные результаты требуется сравнить, а также изобразить графически для каждой из реализаций зависимость коэффициента ускорения программы от количества используемых исполнителей. 
 
-##### Задание первое 
+#### Задание первое 
 
 Програмнный код располагается в _src/task01.cpp_.
 
@@ -165,7 +165,7 @@ int main()
 Вектор расстояний зависимости - _D_ = (0; 0)
 Вектор направлений - _d_ = ("="; "="). Цикл может быть распараллелен по произвольному количеству индексов без всяких ограничений.
 
-Паралельная версия программы с использованием технологии *OpenMP*.
+#### Паралельная версия программы с использованием технологии *OpenMP*.
 
 ```cpp
 /* Main computational cycle. */
@@ -186,8 +186,22 @@ for (int i = 0; i < Isize; i++)
 |-----------|------|-----|-----|-----|-----|-----|-----|-----|-----|-----|------|
 | time      | 11,2 | 6,4 | 4,5 | 3,3 | 3,6 | 3,3 | 3,3 | 3,5 | 3,4 | 3,3 | 3,4  |
 
-<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01_T.png" alt="time(p)" width="700"/>
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01OMP_T.png" alt="task01_OMP time(p)" width="700"/>
 
-<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01_S.png" alt="time(p)" width="700"/>
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01OMP_S.png" alt="task01_OMP S(p)" width="700"/>
 
-<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01_E.png" alt="time(p)" width="700"/>
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01OMP_E.png" alt="task01_OMP E(p)" width="700"/>
+
+#### Паралельная версия программы с использованием технологии *MPI*.
+
+Зависимость времени вычисления от количества исполнителей приведена в таблице:
+
+|           | 1    | 2    | 3    | 4    | 5    | 6    | 8    |
+|-----------|------|------|------|------|------|------|------|
+| time      | 1,82 | 1,23 | 1,04 | 0,92 | 0,97 | 1,04 | 1,03 |
+
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01MPI_T.png" alt="task01_MPI time(p)" width="700"/>
+
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01MPI_S.png" alt="task01_MPI S(p)" width="700"/>
+
+<img src="https://github.com/RustamSubkhankulov/par-prog/blob/main/cycle_parallelization/images/graph01MPI_E.png" alt="task01_MPI E(p)" width="700"/>

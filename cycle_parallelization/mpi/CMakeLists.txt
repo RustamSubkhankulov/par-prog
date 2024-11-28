@@ -13,7 +13,6 @@ foreach(TARGET ${target_list})
   target_include_directories(${TARGET_NAME} PUBLIC ${INC_DIR})
 endforeach(TARGET)
 
-option(PARALLEL "Parallel version of the programm" OFF)
 option(TIMING "Measure execution time" OFF)
 option(QUIET "Disable result printing" OFF)
 
