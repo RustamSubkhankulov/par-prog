@@ -50,8 +50,9 @@ C++ включает встроенную поддержку потоков, а�
 
 ### Проекты
 1. [Метод глобального стека для параллельного вычисления интеграла с использованием **std::thread**.](https://github.com/RustamSubkhankulov/parprog/tree/main/global_stack)
-2. [Поиск всех подпалиндромов в заданной строке с использование **OpenMP** (in development).](https://github.com/RustamSubkhankulov/parprog/tree/main/subpalindromes)
-3. [Численное решение уравнения переноса с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/transfer_equation)
-4. [Ускорение подсчёта числа Pi с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/pi_estimation)
-5. [Измерение задержки передачи сообщений между двумя узлами сети с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/comm_delay)
-6. [Базовый пример использования **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/basic)
+2. [Поиск всех подпалиндромов в заданной строке с использование **OpenMP**.](https://github.com/RustamSubkhankulov/parprog/tree/main/subpalindromes)
+3. [Распараллеливание циклов с зависимостями с использованием **OpenMP** и *MPI*.](https://github.com/RustamSubkhankulov/par-prog/tree/main/cycle_parallelization)
+4. [Численное решение уравнения переноса с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/transfer_equation)
+5. [Ускорение подсчёта числа Pi с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/pi_estimation)
+6. [Измерение задержки передачи сообщений между двумя узлами сети с помощью технологии **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/comm_delay)
+7. [Базовый пример использования **MPI**.](https://github.com/RustamSubkhankulov/parprog/tree/main/basic)
